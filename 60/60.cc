@@ -57,17 +57,23 @@ bool is_prime(size_t const num, std::vector<size_t> const &test)
   return true;
 }
 
-inline bool is_concat_prime(size_t p1, size_t p2, std::vector<size_t> const &test, std::map<duo, bool> &cache)
+size_t concat(size_t a, size_t b)
 {
-  if (cache.count(std::make_pair(p1, p2)))
-    return cache[std::make_pair(p1, p2)];
+  size_t multiplier = 1;
+  for (size_t copy = b; copy != 0; copy /= 10, multiplier *= 10);
+  return multiplier * a + b;
+}
 
-  auto fst = std::to_string(p1) + std::to_string(p2);
-  auto snd = std::to_string(p2) + std::to_string(p1);
+bool is_concat_prime(size_t p1, size_t p2, std::vector<size_t> const &test, std::map<duo, bool> &cache)
+{
+  auto const key = std::make_pair(p1, p2);
 
-  bool res = is_prime(stoul(fst), test) && is_prime(stoul(snd), test);
+  if (cache.count(key))
+    return cache[key];
 
-  cache.insert(std::make_pair(std::make_pair(p1, p2), res));
+  bool const res = is_prime(concat(p1, p2), test) && is_prime(concat(p2, p1), test);
+
+  cache.insert(std::make_pair(key, res));
 
   return res;
 }
@@ -125,7 +131,7 @@ size_t search(std::vector<size_t> const &group, std::vector<size_t> const &test,
 
 int main()
 {
-  auto const primes = primes_modulo_30_groups(10'000);
+  auto const primes = primes_modulo_30_groups(30'000);
   auto const all = std::get<2>(primes);
 
   size_t sum = 30'000 * 5;
