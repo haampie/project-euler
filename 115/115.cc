@@ -3,27 +3,32 @@
 #include <algorithm>
 #include <iterator>
 
-size_t count(size_t n)
+int64_t first_k(int64_t min = 1'000'000, int64_t b = 50)
 {
-    std::vector<int64_t> v(n + 1, 0);
+    std::vector<int64_t> v(b, 0);
 
-    for (int64_t k = 3; k <= n; ++k)
+    for (int64_t k = b;; ++k)
     {
-        // There are k-2 bricks of length 3 to k.
-        v[k] += k - 2;
+        // There are k - b + 1 bricks of length b to k.
+        int64_t vk = k - b + 1;
 
         // Then the remainder can be filled
-        for (int64_t l = 1; l < k - 3; ++l)
-            v[k] += v[l];
+        for (int64_t l = 1; l < k - b; ++l)
+            vk += v[l];
 
         // And then there is the situation where you don't place a brick at `k`
-        v[k] += v[k - 1];
+        vk += v[k - 1];
+
+        if (vk + 1 > min)
+            return k;
+ 
+        v.push_back(vk);
     }
 
-    return v[n] + 1; // also count the empty one.
+    return -1;
 }
 
 int main()
 {
-    std::cout << count(50) << '\n';
+    std::cout << first_k(1'000'000, 50) << '\n';
 }
